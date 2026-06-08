@@ -18,7 +18,7 @@ public class Activity
 
     public bool IsCancelled {get;set;}
 
-    //location Probls
+    //location props
 
     public required string City{get;set;}
 
