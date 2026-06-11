@@ -11,22 +11,25 @@ import { ReactQueryDevtools } from '@tanstack/react-query-devtools/production';
 import { RouterProvider } from 'react-router';
 import { router } from './app/router/Router';
 import { store, StoreContext } from './lib/stores/store';
-import {ToastContainer} from 'react-toastify';
+import { ToastContainer } from 'react-toastify';
+import { LocalizationProvider } from '@mui/x-date-pickers';
+import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns'
 
 
 const queryClinet = new QueryClient();
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <StoreContext.Provider value={store}>
-    <QueryClientProvider client={queryClinet}>
+    <LocalizationProvider dateAdapter={AdapterDateFns}>
+      <StoreContext.Provider value={store}>
+        <QueryClientProvider client={queryClinet}>
+          <ReactQueryDevtools />
+          <ToastContainer position='bottom-right' hideProgressBar theme='colored' />
+          <RouterProvider router={router} />
+        </QueryClientProvider >
+      </StoreContext.Provider>
+    </LocalizationProvider>
 
-      <ReactQueryDevtools/>
-      <ToastContainer position='bottom-right' hideProgressBar theme='colored' />
 
-    <RouterProvider router={router} />
-    </QueryClientProvider >
-    </StoreContext.Provider>
- 
   </StrictMode>,
 )
