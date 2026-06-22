@@ -10,4 +10,8 @@ public class User : IdentityUser
     public string? Bio {get;set;}
 
     public string? ImageUrl {get;set;}
+
+    //Nav properties
+
+    public ICollection<ActivityAttendee> Activities {get;set;} = [];
 }

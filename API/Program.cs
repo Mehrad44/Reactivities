@@ -3,8 +3,10 @@ using Application.Activities.Command;
 using Application.Activities.Queries;
 using Application.Activities.Validators;
 using Application.core;
+using Application.Interfaces;
 using Domain;
 using FluentValidation;
+using Infrastructure.Security;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.Authorization;
@@ -27,6 +29,7 @@ builder.Services.AddDbContext<AppDbContext>(opt =>
 
 });
 
+
 builder.Services.AddCors();
 
 builder.Services.AddMediatR(x =>
@@ -37,7 +40,7 @@ builder.Services.AddMediatR(x =>
 });
 
 
-
+builder.Services.AddScoped<IUserAccessor,UserAccessor>();
 builder.Services.AddAutoMapper(typeof(MappingProfiles).Assembly);
 builder.Services.AddValidatorsFromAssemblyContaining<CreateActivityValidator>();
 builder.Services.AddTransient<ExceptionMiddleware>();
@@ -47,7 +50,15 @@ builder.Services.AddIdentityApiEndpoints<User>(opt =>
 })
 .AddRoles<IdentityRole>()
 .AddEntityFrameworkStores<AppDbContext>();
+builder.Services.AddAuthorization(opt =>
+{
+   opt.AddPolicy("IsActivityHost",policy =>
+   {
+       policy.Requirements.Add(new IsHostRequirement());
+   }) ;
+});
 
+builder.Services.AddTransient<IAuthorizationHandler,IHostRequirementHandler>();
 
 var app = builder.Build();
 app.UseMiddleware<ExceptionMiddleware>();
