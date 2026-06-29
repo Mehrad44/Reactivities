@@ -6,6 +6,7 @@ using Application.core;
 using Application.Interfaces;
 using Domain;
 using FluentValidation;
+using Infrastructure.Photos;
 using Infrastructure.Security;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -41,9 +42,10 @@ builder.Services.AddMediatR(x =>
 
 
 builder.Services.AddScoped<IUserAccessor,UserAccessor>();
-builder.Services.AddAutoMapper(typeof(MappingProfiles).Assembly);
+builder.Services.AddAutoMapper(cfg => { }, typeof(MappingProfiles).Assembly);
 builder.Services.AddValidatorsFromAssemblyContaining<CreateActivityValidator>();
 builder.Services.AddTransient<ExceptionMiddleware>();
+builder.Services.AddScoped<IPhotoService,PhotoService>();
 builder.Services.AddIdentityApiEndpoints<User>(opt =>
 {
     opt.User.RequireUniqueEmail = true;
@@ -58,6 +60,8 @@ builder.Services.AddAuthorization(opt =>
    }) ;
 });
 
+builder.Services.Configure<CloudinarySettings>(builder.Configuration
+        .GetSection("CloudinarySettings"));
 builder.Services.AddTransient<IAuthorizationHandler,IHostRequirementHandler>();
 
 var app = builder.Build();
@@ -93,7 +97,7 @@ try
 }catch(Exception ex)
 {
     var logger = services.GetRequiredService<ILogger<Program>>();    
-    logger.LogError(ex , "An error occured during migrations");
+    logger.LogError(ex , "An error occurred during migrations");
 
 }
 
