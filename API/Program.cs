@@ -1,4 +1,5 @@
 using API.Middleware;
+using API.SignalR;
 using Application.Activities.Command;
 using Application.Activities.Queries;
 using Application.Activities.Validators;
@@ -46,6 +47,7 @@ builder.Services.AddAutoMapper(cfg => { }, typeof(MappingProfiles).Assembly);
 builder.Services.AddValidatorsFromAssemblyContaining<CreateActivityValidator>();
 builder.Services.AddTransient<ExceptionMiddleware>();
 builder.Services.AddScoped<IPhotoService,PhotoService>();
+builder.Services.AddSignalR();
 builder.Services.AddIdentityApiEndpoints<User>(opt =>
 {
     opt.User.RequireUniqueEmail = true;
@@ -80,6 +82,7 @@ app.UseAuthorization();
 
 app.MapControllers();
 app.MapGroup("api").MapIdentityApi<User>();
+app.MapHub<CommentHub>("/comments");
 
 using var scope = app.Services.CreateScope();
 
@@ -90,6 +93,7 @@ try
 {
     var context = services.GetRequiredService<AppDbContext>();
     var userManager = services.GetRequiredService<UserManager<User>>();
+
 
     await context.Database.MigrateAsync();
     await DbInitializer.SeedData(context,userManager);
